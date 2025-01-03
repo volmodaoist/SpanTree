@@ -1,11 +1,13 @@
 # TraceSpanTree README
 
-Hey devs! 😎 Struggling with complex trace data in tests? Check out TraceSpanTree! Give a star ⭐. Let's make it better!
+Hey devs! 😎 Struggling with complex trace data in tests? Check out TraceSpanTree! 
 
 To try it, run:
 ```shell
 pip install -i https://test.pypi.org/simple/ TraceSpanTree==0.1.0
 ```
+
+Give a star ⭐. Let's make it better!
 
 
 
