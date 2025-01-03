@@ -1,0 +1,59 @@
+{
+  "spans": [
+    {
+      "name": "root",
+      "type": "root",
+      "span_id": "1",
+      "parent_id": "0",
+      "state_code": 0,
+      "data": {
+        "message": "This is the root span.",
+        "timestamp": "2024-01-01T00:00:00Z"
+      }
+    },
+    {
+      "name": "father_span_1",
+      "type": "father",
+      "span_id": "2",
+      "parent_id": "1",
+      "state_code": 0,
+      "data": {
+        "message": "This is a sub span under root.",
+        "timestamp": "2024-01-01T00:00:10Z"
+      }
+    },
+    {
+      "name": "leaf_span_1",
+      "type": "leaf",
+      "span_id": "3",
+      "parent_id": "2",
+      "state_code": -1,
+      "data": {
+        "message": "This is a leaf span under father_span_1.",
+        "timestamp": "2024-01-01T00:00:15Z"
+      }
+    },
+    {
+      "name": "father_span_2",
+      "type": "father",
+      "span_id": "5",
+      "parent_id": "1",
+      "state_code": 0,
+      "data": {
+        "message": "This is a sub span under root.",
+        "timestamp": "2024-01-01T00:00:30Z"
+      }
+    },
+    {
+      "name": "leaf_span_2",
+      "type": "leaf",
+      "span_id": "6",
+      "parent_id": "5",
+      "state_code": -1,
+      "data": {
+        "message": "This is a leaf span under father_span_2.",
+        "timestamp": "2024-01-01T00:00:35Z"
+      }
+    }
+  ]
+}

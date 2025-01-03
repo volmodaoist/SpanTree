@@ -1,0 +1,123 @@
+{
+    "spans": [
+        {
+            "name": "root",
+            "type": "root",
+            "span_id": "1",
+            "parent_id": "0",
+            "state_code": 0,
+            "input": {
+                "param_str": "123",
+                "param_int": 123
+            },
+            "output": [
+                {
+                    "result_key": "root_result_value, idx = 0",
+                    "sub_result": [
+                        {
+                            "sub_key": "root_sub1_value, idx = 0"
+                        }
+                    ]
+                },
+                {
+                    "result_key": "root_result_value, idx = 1",
+                    "sub_result": [
+                        {
+                            "sub_key": "root_sub_value, idx = 1"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "father_span_1",
+            "type": "father",
+            "span_id": "2",
+            "parent_id": "1",
+            "state_code": 0,
+            "input": {
+                "param_str": "456",
+                "param_int": 456
+            },
+            "output": [
+                {
+                    "result_key": "father_result_value",
+                    "sub_result": [
+                        {
+                            "sub_key": "father_sub_value"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "leaf_span_1",
+            "type": "leaf",
+            "span_id": "3",
+            "parent_id": "2",
+            "state_code": -1,
+            "input": {
+                "param_str": "789",
+                "param_int": 789
+            },
+            "output": [
+                {
+                    "result_key": "leaf1_result_value, idx = 0",
+                    "sub_result": [
+                        {
+                            "sub_key": "leaf1_sub_value, idx = 0"
+                        }
+                    ]
+                },
+                {
+                    "result_key": "leaf1_result_value, idx = 1"
+                }
+            ]
+        },
+        {
+            "name": "father_span_2",
+            "type": "father",
+            "span_id": "4",
+            "parent_id": "1",
+            "state_code": 0,
+            "input": {
+                "param_str": "1011",
+                "param_int": 1011
+            },
+            "output": [
+                {
+                    "result_key": "father2_result_value",
+                    "sub_result": [
+                        {
+                            "sub_key": "father2_sub_value"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "leaf_span_2",
+            "type": "leaf",
+            "span_id": "5",
+            "parent_id": "4",
+            "state_code": -1,
+            "input": {
+                "param_str": "1213",
+                "param_int": 1213
+            },
+            "output": [
+                {
+                    "result_key": "leaf2_result_value, idx = 0",
+                    "sub_result": [
+                        {
+                            "sub_key": "leaf2_sub_value, idx = 0"
+                        }
+                    ]
+                },
+                {
+                    "result_key": "leaf2_result_value, idx = 1"
+                }
+            ]
+        }
+    ]
+}
