@@ -1,11 +1,11 @@
 import json
 import pytest
-import SpanTree as st
+import TraceSpanTree as st
 
 
 @pytest.fixture
 def span_data():
-    with open("demo2.json") as d1:
+    with open("./demo2.json") as d1:
         spans = json.load(d1)['spans']
     return spans
 

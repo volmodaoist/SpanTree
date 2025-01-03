@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='SpanTree',
+    name='TraceSpanTree',
     version='0.1.0',
     description='A tool to assist QA Engineers in writing assertions by parsing program call traces.',
     long_description=open('README.md').read(),
