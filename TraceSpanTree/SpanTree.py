@@ -167,10 +167,14 @@ class SpanTree:
         
         parts = target_span_name.split(self.sep)
         
-        if isinstance(is_type, bool):
-            is_types = [is_type for _ in range(len(parts))]
+        if not isinstance(is_type, (bool, list)): 
+            raise TypeError(f"Expected 'is_type' to be of type bool or list, but got {type(is_type).__name__}.")
+
+        if isinstance(is_type, list): 
+            is_types = is_type  
         else:
-            is_types = is_type
+            is_types = [is_type for _ in range(len(parts))]
+        
              
         node = self.root
         for part, is_type in zip(parts, is_types):
