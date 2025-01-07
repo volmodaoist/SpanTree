@@ -1,12 +1,16 @@
 import json
 import random
+import warnings
 import concurrent.futures
 from typing import Any, Dict, List, Optional, Callable, Union
 
 
 class SpanTree:     
-    def __init__(self, spans: List, super_id = None, keymaps: Dict = None):
-        self._init_meta(spans, super_id, keymaps)
+    def __init__(self, spans: List, super_id = None, sep = '.', keymaps: Dict = None):
+        if spans is None or len(spans) == 0:
+            warnings.warn("'spans' is empty. Please provide a non-empty list.", UserWarning)
+            
+        self._init_meta(spans, super_id, sep, keymaps)
 
     def expand_span(self, span: Dict):
         ''' 展开 span，递归地解析 JSON 字符串为字典。如果解析失败，保留原始值
@@ -28,7 +32,7 @@ class SpanTree:
                 span[key] = [self.expand_span(item) if isinstance(item, dict) else item for item in value]
         return span
 
-    def _init_meta(self, spans: List, super_id = None, keymaps: Dict = None):
+    def _init_meta(self, spans: List, super_id = None, sep = '.', keymaps: Dict = None):
         ''' 1.  首先展开所有的 span，重建 spans 
             2.  然后初始化重要树结构基本信息，再对 spans 建树
         '''
@@ -64,7 +68,7 @@ class SpanTree:
                     3. 直接通过集合相减的方式，直接拿到超根节点，代码写法最简洁，但是时间复杂度 O(M + N + min(M,N))， M 与 N 分别是非叶子结点、树节点key个数。
             '''
             
-            if super_id is None:
+            if super_id is None and len(spans) > 0:
                 random_span = random.choice(spans) 
                 current_id = random_span.get("span_id")
                 while current_id in parent_map:
@@ -77,7 +81,9 @@ class SpanTree:
                                             
             self.span_map, self.parent_map, self.sons = span_map, parent_map, sons
             
-
+        # 初始化分割符信息
+        self.sep = sep
+        
         # 预处理Trace数据
         spans = self.setup_keys(spans, keymaps)
         spans = [self.expand_span(span) for span in spans]
@@ -122,7 +128,7 @@ class SpanTree:
                     记作: 'key1.key2.key3.key4.key5.key6'，那么 target_key 可以是这条路径的一个非连续子序列，
                     比如 'key1.key3.key5'，通过这个路径我们可以查找 key5 对应的 value
         '''
-        subtree, parts = span, target_field.split('.')
+        subtree, parts = span, target_field.split(self.sep)
         for part in parts:
             if subtree is None or not isinstance(subtree, (list, dict)):
                 break
@@ -159,10 +165,12 @@ class SpanTree:
                     is_type 则以 type 取代 name 进行搜索
         '''
         
-        parts = target_span_name.split('.')
+        parts = target_span_name.split(self.sep)
         
         if isinstance(is_type, bool):
             is_types = [is_type for _ in range(len(parts))]
+        else:
+            is_types = is_type
              
         node = self.root
         for part, is_type in zip(parts, is_types):
@@ -221,8 +229,8 @@ class SpanTree:
 
 
             if isinstance(target_fields, list):
-                name_prefix = target_span_name.split('.')[-1]
-                target_fields = [(f"{name_prefix} {value[0].split('.')[-1]}", *value) for value in target_fields]
+                name_prefix = target_span_name.split(self.sep)[-1]
+                target_fields = [(f"{name_prefix} {value[0].split(self.sep)[-1]}", *value) for value in target_fields]
                 
             elif isinstance(target_fields, dict):
                 target_fields = [(key, *value) for key, value in target_fields.items()]                
