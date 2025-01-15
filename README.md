@@ -4,7 +4,7 @@ Hey devs! 😎 Struggling with complex trace data in tests? Check out TraceSpanT
 
 To try it, run:
 ```shell
-pip install -i https://test.pypi.org/simple/ TraceSpanTree==0.1.0
+pip install -i https://test.pypi.org/simple/ TraceSpanTree==0.1.1
 ```
 
 Give a star ⭐. Let's make it better!
