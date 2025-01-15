@@ -30,3 +30,4 @@
 '''
 
 from .SpanTree import SpanTree as SpanTree
+from .MultiNestDict import MultiNestDict as MultiNestDict
