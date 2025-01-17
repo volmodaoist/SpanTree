@@ -1,6 +1,5 @@
 import json
 
-
 class MultiNestDict:    
     @staticmethod
     def expand(data):
@@ -29,7 +28,7 @@ class MultiNestDict:
         return data
 
     @staticmethod
-    def find_key(data, target_key):
+    def find_key(data, target_key, default = None):
         def recursive_search(d):
             if isinstance(d, (dict, list)):
                 iterable = d.items() if isinstance(d, dict) else d
@@ -41,7 +40,7 @@ class MultiNestDict:
                     if result is not None:
                         return result
             return None
-        return recursive_search(MultiNestDict.expand(data))
+        return recursive_search(MultiNestDict.expand(data)) or default
     
     @staticmethod
     def update_key(data, target_key, val):
