@@ -1,11 +1,11 @@
 # TraceSpanTree README
 
-Hey developers! 🚀 Tired of dealing with complex nested trace data in your projects? **TraceSpanTree** is here to help!
+Hey developers! 🚀 Tired of dealing with complex nested trace data (or nested dict) in your projects? **TraceSpanTree** is here to help!
 
 Quick install:
 
 ```shell
-pip install -i https://test.pypi.org/simple/ TraceSpanTree==0.1.3
+pip install -i https://test.pypi.org/simple/ TraceSpanTree==1.0.0
 ```
 
 Give us a ⭐ and let's simplify your trace data management!

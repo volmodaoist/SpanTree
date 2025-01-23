@@ -5,7 +5,7 @@
 快速安装：
 
 ```shell
-pip install -i https://test.pypi.org/simple/ TraceSpanTree==0.1.3
+pip install -i https://test.pypi.org/simple/ TraceSpanTree==1.0.0
 ```
 
 如果觉得不错，给我们点个 ⭐ 收藏吧！ ，让我们一起简化自动化代码编写、调用链路分析与追踪的工作！
