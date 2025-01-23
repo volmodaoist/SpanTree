@@ -1,24 +1,39 @@
 # TraceSpanTree README
 
-Hey devs! 😎 Struggling with complex trace data in tests? Check out TraceSpanTree! 
+Hey developers! 🚀 Tired of dealing with complex nested trace data in your projects? **TraceSpanTree** is here to help!
 
-To try it, run:
+Quick install:
+
 ```shell
-pip install -i https://test.pypi.org/simple/ TraceSpanTree==0.1.2
+pip install -i https://test.pypi.org/simple/ TraceSpanTree==0.1.3
 ```
 
-Give a star ⭐. Let's make it better!
-
+Give us a ⭐ and let's simplify your trace data management!
 
 
 ## 😎 Introduction
-Hello there, fellow QA engineers and test development colleagues! We've put together this little helper called SpanTree, which is essentially a Python library. You're probably all too familiar with the situation: when we're in the thick of project work, we frequently have to write test scripts based on those trace files (mostly in JSON format) that get generated during runtime. And making assertions on key-value pairs is a regular task. But, as you've likely experienced, these key-value pairs often sit within complex hierarchical structures. Before we knew it, our code was filled with multiple layers of nested dictionaries, forcing us to use a ton of square brackets just to access the specific values we needed. What's more, any changes the R&D team makes to the code can really throw off the hierarchy of those key-value pairs, making our test script maintenance a bit of a headache. So, we thought we'd give it a shot and create something that might ease this pain a little. That's how SpanTree came to be. It's by no means a perfect solution, but we're hoping it'll prove useful and save you some hassle in your day-to-day work.
+Hello, fellow developers and QA engineers! We've built **TraceSpanTree**, a Python library designed to simplify working with complex hierarchical trace data, which is often stored in JSON format during project execution (or Debug). Managing nested key-value pairs and writing assertions can be tedious, especially when the data structure changes frequently.
+
+With **TraceSpanTree**, you can easily navigate, update, and retrieve key-value pairs within multi-level nested dictionaries and span structures. Our goal is to provide an efficient way to manage trace data, reducing code complexity and maintenance overhead.
+
+
+## 🚀 Features Overview
+
+The **TraceSpanTree** library includes the following core components:
+
+1. **`Log`** – Simplified logging utility to track trace operations efficiently.
+2. **`MultiNestDict`** – Enables easy retrieval and updates within deeply nested dictionaries.
+3. **`SpanTree`** – Facilitates searching and retrieving values within complex trace hierarchies.
+4. **`TraceGen`** – Provides the `Tracer` object with `@tracer.trace_gen` decorator to automatically generate span trees from function calls.
 
 
 
-## 💡 Concept of SpanTree 
-Imagine this scenario: the trace of a project, grounded in its call relationships, can be conceived of and visualized as a tree structure. Each node in this tree represents what we call a “span”. In simple terms, a span is a node that contains the information produced by the operation of each service. And interestingly, each span is represented as a JSON object, and a JSON object itself can be regarded as a tree. So, in essence, SpanTree is like a structure of “trees within trees”. We kind of stumbled upon this concept while trying to find a better way to handle the hierarchical data that was constantly tripping us up in our testing efforts. It might seem a bit tricky to grasp at first, but we believe that as you use it more, it'll start to make sense and hopefully make your work a bit easier. 
+🌳 Concept of SpanTree
+Think of trace data as a tree structure where:
+- Each node (span) represents operational data from a specific service.
+- Each span is stored as a JSON object, which itself can be treated as a tree.
 
+The result? A “tree within trees” model that helps navigate trace data more efficiently. By leveraging this structure, TraceSpanTree provides robust tools to locate and interact with data at any level.
 
 
 
@@ -345,3 +360,9 @@ This way, whether you're using the simple `retrive` function for quick access to
 
 ## 📑 Conclusion 
 SpanTree is our attempt to simplify the process of handling hierarchical data in test scripts for QA engineers and test development engineers. We've put a lot of thought into its design and functionality, but we know there's still a lot to learn and improve. By leveraging its features and functions, we hope you can focus more on the actual testing logic rather than getting bogged down in complex data access and maintenance issues. If you decide to give it a try in your projects, we'd love to hear your thoughts and experiences. Let's make our testing workflows better together! 
+
+
+
+## 🤝 Contributing
+
+If you'd like to contribute, fork the repository and submit a pull request. We welcome suggestions and improvements to make TraceSpanTree even better!
