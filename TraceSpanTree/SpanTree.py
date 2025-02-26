@@ -3,9 +3,10 @@ import random
 import warnings
 import concurrent.futures
 
-from utils import try_catch
 from typing import Any, Dict, List, Optional, Callable, Union
 
+
+from .utils import try_catch
 
 
 

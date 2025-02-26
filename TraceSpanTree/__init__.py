@@ -29,6 +29,10 @@
             
 '''
 
+from .utils import (
+  try_catch
+)
 from .Log import Log as Log
 from .SpanTree import SpanTree as SpanTree
 from .MultiNestDict import MultiNestDict as MultiNestDict
+from .TraceGen import Tracer
