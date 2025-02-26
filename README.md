@@ -5,7 +5,7 @@ Hey developers! 🚀 Tired of dealing with complex nested trace data (or nested 
 Quick install:
 
 ```shell
-pip install -i https://test.pypi.org/simple/ TraceSpanTree==1.0.0
+pip install -i https://test.pypi.org/simple/ TraceSpanTree==1.0.1
 ```
 
 Give us a ⭐ and let's simplify your trace data management!
