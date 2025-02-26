@@ -2,7 +2,25 @@ import json
 import random
 import warnings
 import concurrent.futures
+
+from functools import wraps
 from typing import Any, Dict, List, Optional, Callable, Union
+
+
+def try_catch(error_msg):
+    ''' 柯里化错误信息捕获装饰器，捕获被装饰函数中抛出的异常，
+        并以指定的错误信息包装后重新抛出。
+    '''
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                raise Exception(f"{error_msg}: {e}") from e
+        return wrapper
+    return decorator
+
 
 
 class SpanTree:     
@@ -119,7 +137,7 @@ class SpanTree:
     
         return None
     
-
+    @try_catch("Inner-SpanNodeSearchError")
     def _recursive_inner_search(self, span: Union[Dict, List], target_field: str, idx: int = None) -> Optional[Any]:
         ''' 函数作用: 在一个 span 内部递归搜索 target_key, 这个 target支持 '.' 约束。 idx 约束意思是说，是对List[Dict]而言的，
                     意思是说，只抓第idx个Dict元素里面的字段
@@ -155,7 +173,7 @@ class SpanTree:
             
         return None
     
-
+    @try_catch("Inter-SpanNodeSearchError")
     def _recursive_inter_search(self, target_span_name: str, is_type: Union[bool, List] = False) -> Optional[Any]:
         ''' 函数作用: 在一个 span 之间递归搜索 target_span_name, 这个 target 支持 '.' 约束
         
@@ -184,14 +202,14 @@ class SpanTree:
         return node
 
 
-
     def retrive(self, target_span_name: str, target_field, idx: int = None, is_type: bool = False, 
                 callback: Callable = None):
         span = self._recursive_inter_search(target_span_name, is_type)
         value = self._recursive_inner_search(span, target_field, idx)
         
         if callback is not None:
-            value = callback(value)
+            decorated_callback = try_catch("Error occurred in Callback function")(callback)
+            value = decorated_callback(value)
         
         return value
 
@@ -231,7 +249,6 @@ class SpanTree:
                     f"(field_name, default, callback)."
                 )
 
-
             if isinstance(target_fields, list):
                 name_prefix = target_span_name.split(self.sep)[-1]
                 target_fields = [(f"{name_prefix} {value[0].split(self.sep)[-1]}", *value) for value in target_fields]
@@ -252,6 +269,7 @@ class SpanTree:
                         is_type=is_type,
                         callback=callback
                     )
+                
                     if value_got is not None:
                         value = value_got
                 except Exception as e:
