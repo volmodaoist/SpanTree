@@ -1,11 +1,13 @@
 import json
-from typing import Dict, Any
+from typing import Any
+
+
 
 class MultiNestDict:    
     ''' 通过递归的方式展开数据，主要用于展开字符串格式的JSON或Dict
     '''
     @staticmethod
-    def expand(data:Dict) -> Dict:
+    def expand(data: dict) -> dict:
         # 如果 data 不是 dict、list 或 str 这种可展开类型，直接返回
         if not isinstance(data, (dict, list, str)):
             return data
@@ -31,7 +33,7 @@ class MultiNestDict:
         return data
 
     @staticmethod
-    def find_key(data:Dict, target_key:str, default:Any = None, sep = '.') -> Any:
+    def find_key(data:dict, target_key:str, default:Any = None, sep = '.') -> Any:
         ''' target_key 可以是多个key通过'.'连接在一起的序列，当这个子序列是根节点到目标节点的子序列时，
             能够实现缩小目标 key 范围的效果 (通常用于目标key存在同名的情况)
         ''' 
@@ -56,7 +58,7 @@ class MultiNestDict:
         return val or default
     
     @staticmethod
-    def update_key(data:Dict, target_key:str, val) -> bool:
+    def update_key(data:dict, target_key:str, val) -> bool:
         def recursive_update(d):
             if isinstance(d, dict):
                 if target_key in d:
@@ -70,7 +72,7 @@ class MultiNestDict:
         return recursive_update(MultiNestDict.expand(data))
 
     @staticmethod
-    def update_key_batch(raw_dict:Dict, replace_dict:Dict) -> Dict:
+    def update_key_batch(raw_dict:dict, replace_dict:dict) -> dict:
         # NOTE: 使用 replace_dict 键值对批量更新 raw_dict 之中的键值对的，并返回更新之后的结果。
         if raw_dict is None or replace_dict is None:
             return raw_dict or replace_dict
