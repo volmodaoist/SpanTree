@@ -3,7 +3,7 @@ import random
 import warnings
 import concurrent.futures
 
-from typing import Any, Dict, List, Optional, Callable, Union
+from typing import Any, Optional, Callable, Union
 
 
 from .utils import try_catch
@@ -11,13 +11,13 @@ from .utils import try_catch
 
 
 class SpanTree:     
-    def __init__(self, spans: List, super_id = None, sep = '.', keymaps: Dict = None):
+    def __init__(self, spans: list, super_id = None, sep = '.', keymaps: dict = None):
         if spans is None or len(spans) == 0:
             warnings.warn("'spans' is empty. Please provide a non-empty list.", UserWarning)
             
         self._init_meta(spans, super_id, sep, keymaps)
 
-    def expand_span(self, span: Dict):
+    def expand_span(self, span: dict):
         ''' 展开 span，递归地解析 JSON 字符串为字典。如果解析失败，保留原始值
         '''
         if not isinstance(span, dict):
@@ -37,11 +37,11 @@ class SpanTree:
                 span[key] = [self.expand_span(item) if isinstance(item, dict) else item for item in value]
         return span
 
-    def _init_meta(self, spans: List, super_id = None, sep = '.', keymaps: Dict = None):
+    def _init_meta(self, spans: list, super_id = None, sep = '.', keymaps: dict = None):
         ''' 1.  首先展开所有的 span，重建 spans 
             2.  然后初始化重要树结构基本信息，再对 spans 建树
         '''
-        def _build_tree(spans: List, super_id = None):
+        def _build_tree(spans: list, super_id = None):
             ''' 此处的建树，是以span粒度构建的，每个服务的调用会产生一个span，换句话说，每个树节点是一个span，树节点展开之后仍然是一棵树
                     - span_id: 通过 span_id 访问树节点所有内容
                     - parent_id: 通过 span_id 访问树节点的父节点
@@ -125,7 +125,7 @@ class SpanTree:
         return None
     
     @try_catch("Inner-SpanNodeSearchError")
-    def _recursive_inner_search(self, span: Union[Dict, List], target_field: str, idx: int = None) -> Optional[Any]:
+    def _recursive_inner_search(self, span: Union[dict, list], target_field: str, idx: int = None) -> Optional[Any]:
         ''' 函数作用: 在一个 span 内部递归搜索 target_key, 这个 target支持 '.' 约束。 idx 约束意思是说，是对List[Dict]而言的，
                     意思是说，只抓第idx个Dict元素里面的字段
         
@@ -161,7 +161,7 @@ class SpanTree:
         return None
     
     @try_catch("Inter-SpanNodeSearchError")
-    def _recursive_inter_search(self, target_span_name: str, is_type: Union[bool, List] = False) -> Optional[Any]:
+    def _recursive_inter_search(self, target_span_name: str, is_type: Union[bool, list] = False) -> Optional[Any]:
         ''' 函数作用: 在一个 span 之间递归搜索 target_span_name, 这个 target 支持 '.' 约束
         
             使用说明: 整个 spans 展开之后是一棵树，假设从根节点出发走到叶子节点的 span name 构成一个路径，这条完整路径
@@ -286,7 +286,7 @@ class SpanTree:
 
 
 
-    def _get_ancestors(self, span_id: str) -> List[Dict]:
+    def _get_ancestors(self, span_id: str) -> list[dict]:
         ''' 获取指定 span_id 所有祖先节点。
         '''
         ancestors = []
