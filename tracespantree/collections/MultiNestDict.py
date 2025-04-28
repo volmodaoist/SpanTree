@@ -102,7 +102,8 @@ class MultiNestDict:
             return _merge_dicts(raw_json, replace_json)
         else:
             return replace_json
-        
+
+KVTree = MultiNestDict      
 
 if __name__ == '__main__':
     nested_data = {

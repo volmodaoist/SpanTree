@@ -4,9 +4,7 @@ import warnings
 import concurrent.futures
 
 from typing import Any, Optional, Callable, Union
-
-
-from .utils import try_catch
+from tracespantree.utils.decorator import try_catch
 
 
 
