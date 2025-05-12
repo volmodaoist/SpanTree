@@ -1,2 +1,2 @@
-from tracespantree.collections.MultiNestDict import MultiNestDict, KVTree
-from tracespantree.collections.SpanTree import SpanTree
+from tracespantree.collections.kvtree import MultiNestDict, KVTree
+from tracespantree.collections.spantree import SpanTree

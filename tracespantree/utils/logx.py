@@ -1,126 +1,133 @@
-''' 调试专用的 Log 对象，用于打印不同级别的日志信息，目前支持以下级别：
-        - verbose: 默认颜色输出，使用 logging.DEBUG 级别，适用于详细信息的日志记录，通常用于开发阶段的低优先级信息。
-        - debug: 紫色输出，使用 logging.DEBUG 级别，等同于 highlight 方法，适用于调试信息或需要强调的内容。
-        - info: 蓝色输出，使用 logging.INFO 级别，适用于普通信息且值得关注的日志记录。
-        - success: 绿色输出，使用 logging.INFO 级别，适用于成功操作或关键事件的通知。
-        - warning: 黄色输出，使用 logging.WARNING 级别，适用于警告信息，表明某些意外情况发生但程序仍可运行。
-        - error: 红色输出，使用 logging.ERROR 级别，适用于错误信息，表明某些功能无法正常工作。
-        - critical: 红色输出，使用 logging.CRITICAL 级别，适用于严重错误信息，表明程序遇到非常严重的问题可能无法继续运行。
-        - highlight: 紫色输出，使用 logging.DEBUG 级别，适用于需要强调或高亮显示的信息，日志级别等于 debug 方法的级别。
-
-    注意事项：日志的颜色和级别通过 ANSI 转义序列实现，适用于支持彩色输出的终端。
-        可以通过 Log.set_level(level) 动态调整日志的最低输出等级（e.g. logging.DEBUG、logging.INFO 等），
-        从而控制日志的显示范围。这个 Log 对象为单例模式，全局唯一实例可通过 Log 访问。
-'''
-
+import os
+import time
 import logging
+import colorlog
 
-class LogX:
-    # 颜色代码
-    color_codes = {
-        "default": "\033[0m",  # 默认颜色
-        "yellow": "\033[33m",  # 黄色 (WARNING)
-        "red": "\033[31m",     # 红色 (ERROR, CRITICAL)
-        "blue": "\033[34m",    # 蓝色 (INFO)
-        "green": "\033[32m",   # 绿色 (SUCCESS)
-        "purple": "\033[35m",  # 紫色 (DEBUG, HIGHLIGHT)
-    }
+from typing import TypeVar
 
-    # 单例模式：存储唯一的 Log 实例
-    _instance = None
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(LogX, cls).__new__(cls)
-            cls._instance._initialize_logger()
-        return cls._instance
+try:
+    from typing import Protocol 
+except ImportError:
+    from typing_extensions import Protocol 
 
-    def _initialize_logger(self):
-        """初始化 logger"""
-        self.logger = logging.getLogger("ColorLogger")
-        self.logger.setLevel(logging.DEBUG)  # 设置默认日志等级为 DEBUG
 
-        # 防止重复添加处理器
-        if not self.logger.handlers:
-            # 创建控制台处理器
-            ch = logging.StreamHandler()
-            ch.setLevel(logging.DEBUG)
+# 定义泛型 Logger 类型
+LogX = TypeVar("LogX", bound=logging.Logger)
 
-            # 设置格式化器
-            formatter = logging.Formatter("%(message)s")  # 只输出消息内容
-            ch.setFormatter(formatter)
 
-            # 添加处理器到 logger
-            self.logger.addHandler(ch)
+# 自定义的 LoggerX 协议
+class LoggerX(Protocol):
+    """自定义 Logger 协议，扩展 logging.Logger 增加 success 和 highlight，并包含所有原生方法"""
 
-    @staticmethod
-    def set_level(level):
-        """
-        动态设置日志输出等级
-        :param level: 日志等级，比如  logging.DEBUG, logging.INFO,  logging.WARNING, logging.ERROR, logging.CRITICAL
-        """
-        logger = logging.getLogger("ColorLogger")
-        logger.setLevel(level)
-        for handler in logger.handlers:
-            handler.setLevel(level)
+    # 原生 logging 方法
+    def debug(self: LogX, msg: str, *args, **kwargs) -> None: ...
+    def info(self: LogX, msg: str, *args, **kwargs) -> None: ...
+    def warning(self: LogX, msg: str, *args, **kwargs) -> None: ...
+    def error(self: LogX, msg: str, *args, **kwargs) -> None: ...
+    def critical(self: LogX, msg: str, *args, **kwargs) -> None: ...
+    def exception(self: LogX, msg: str, *args, **kwargs) -> None: ...
+    def log(self: LogX, level: int, msg: str, *args, **kwargs) -> None: ...
 
-    def verbose(self, text):
-        """打印 VERBOSE 级别日志，使用默认颜色显示"""
-        color_code = self.color_codes["default"]
-        reset_code = self.color_codes["default"]
-        self.logger.debug(f"{color_code}{text}{reset_code}")
+    # 扩展的 success（等价于 info）和 highlight（等价于 debug）
+    def success(self: LogX, msg: str, *args, **kwargs) -> None: ...
+    def highlight(self: LogX, msg: str, *args, **kwargs) -> None: ...
     
-    def debug(self, text):
-        self.highlight(text)
+
+   
         
-    def highlight(self, text):
-        """打印 DEBUG 级别日志，使用紫色显示"""
-        color_code = self.color_codes["purple"]
-        reset_code = self.color_codes["default"]
-        self.logger.debug(f"{color_code}{text}{reset_code}") 
+
+# 日志模块 log_level 控制记录何种级别的日志，低于这个级别的日志不被记录 debug < info < warning < error < critical
+def logger_initiate(log_level=logging.INFO, is_console=True, is_file=True, is_colorful=False) -> LoggerX:
+    """日志基础设置，支持本地控制台和彩色日志文件输出"""
+
+    
         
+    # 统一日志格式
+    log_format = "[%(asctime)s] %(levelname)s - %(pathname)s[line:%(lineno)d]: %(message)s"
+    date_format = "%Y-%m-%d %H:%M:%S"
+
+    # 普通日志格式
+    formatter = logging.Formatter(log_format, datefmt=date_format)
+
+    # 彩色日志格式
+    colorful_formatter = colorlog.ColoredFormatter(
+        "%(log_color)s" + log_format,  # 保持结构一致，仅增加颜色
+        datefmt=date_format,
+        log_colors={
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'bold_red',
+        }
+    )
+
+    # 配置 logger
+    logging.basicConfig(format=log_format, level=log_level)
+    _logger = logging.getLogger("autotest")
+    
+    # 每次调用这个函数之前需要清除已有的 handler，以免日志重复写入
+    if _logger.hasHandlers():
+        _logger.handlers.clear()  
         
-    def success(self, text):
-        """打印 SUCCESS 级别日志，使用绿色显示"""
-        color_code = self.color_codes["green"]
-        reset_code = self.color_codes["default"]
-        self.logger.info(f"{color_code}{text}{reset_code}")
+    _logger.setLevel(log_level)
+
+    # 输出到控制台
+    if is_console:
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(colorful_formatter if is_colorful else formatter)
+        console_handler.setLevel(log_level)
+        _logger.addHandler(console_handler)
+
+    #  输出到文件，文件写入当前正在运行的目录
+    if is_file:
+        current_time = time.strftime("%Y%m%d")
+        log_filename = f"{current_time}.log"
+
+        relative_log_directory = "logs"
+        current_path = os.getcwd()  
+        log_directory = os.path.join(current_path, relative_log_directory)
+
+        if not os.path.exists(log_directory):
+            os.makedirs(log_directory, exist_ok=True)
+
+        file_handler = logging.FileHandler(f"{log_directory}/{log_filename}")
+        file_handler.setLevel(log_level)
         
-    def info(self, text):
-        """打印 INFO 级别日志，使用蓝色显示"""
-        color_code = self.color_codes["blue"]
-        reset_code = self.color_codes["default"]
-        self.logger.info(f"{color_code}{text}{reset_code}")
+        # 文件日志使用普通格式
+        file_handler.setFormatter(formatter)  
         
-    def warning(self, text):
-        """打印 WARNING 级别日志，使用黄色显示"""
-        color_code = self.color_codes["yellow"]
-        reset_code = self.color_codes["default"]
-        self.logger.warning(f"{color_code}{text}{reset_code}")
+        # 每个 handler 处理一个日志，写入文件的这个handler也会打印于终端，需要手动禁用日志传播
+        _logger.addHandler(file_handler)
+        _logger.propagate = False  
+
+    # 动态添加 highlight（等价于 debug）与 success（等价于 info）
+    setattr(_logger, "highlight", _logger.debug)
+    setattr(_logger, "success", _logger.info)
+    
+    return _logger
 
 
-    def error(self, text):
-        """打印 ERROR 级别日志，使用红色显示"""
-        color_code = self.color_codes["red"]
-        reset_code = self.color_codes["default"]
-        self.logger.error(f"{color_code}{text}{reset_code}")
+logger = logger_initiate(log_level=logging.INFO, is_console=True, is_file=True, is_colorful=True)
 
-    def critical(self, text):
-        """打印 CRITICAL 级别日志，使用红色显示"""
-        color_code = self.color_codes["red"]
-        reset_code = self.color_codes["default"]
-        self.logger.critical(f"{color_code}{text}{reset_code}")
+# 兼容老代码
+Log = logger
+
+# 允许被外部导入
+__all__ = ["logger_initiate", "logging", "logger"]  
 
 
-# 全局 Log 实例
-Log = LogX()
 
-
+# 启动 logger，控制台使用彩色日志，测试日志
 if __name__ == '__main__':
-    Log.critical("Hey")
-    Log.error("Hey")
-    Log.warning("Hey")
-    Log.success("Hey")
-    Log.debug("Hey")
-    Log.highlight("Hey")
-    Log.verbose("Hey")
+    logger = logger_initiate(log_level=logging.DEBUG, is_console=True, is_file=True, is_colorful=True)
+    logger.debug("这是 DEBUG 消息")
+    logger.info("这是 INFO 消息")
+    logger.highlight("这是 HIGHLIGHT（等价于 INFO）消息")
+    logger.success("这是 SUCCESS（等价于 DEBUG）消息")
+    logger.warning("这是 WARNING 消息")
+    logger.error("这是 ERROR 消息")
+    logger.critical("这是 CRITICAL 消息")
+
+
